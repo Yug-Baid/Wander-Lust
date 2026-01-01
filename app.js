@@ -73,11 +73,6 @@ async function main() {
 }
 
 
-app.listen(8080,()=>{
-    console.log("Listening to port 8080")
-})
-
-
 app.use(session(sessionOptions));
 app.use(flash());
 
@@ -109,6 +104,12 @@ app.use((req,res,next)=>{
 
 app.use("/listings",listingsRouter)
 app.use("/listings/:id/reviews",reviewsRouter)
+
+// Root route - redirect to listings
+app.get("/", (req, res) => {
+    res.redirect("/listings");
+});
+
 app.use("/",userRouter)
 
 
@@ -122,3 +123,12 @@ app.use((err,req,res,next)=>{
     let {status = 500,message="Unxepected Error"} = err;
    res.status(status).render("./listings/error.ejs",{message})
 })
+
+// Use dynamic port for Vercel deployment
+const PORT = process.env.PORT || 8080;
+app.listen(PORT,()=>{
+    console.log(`Listening to port ${PORT}`)
+})
+
+// Export the Express app for Vercel serverless function
+module.exports = app;
